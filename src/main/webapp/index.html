@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Sharing Platform</title>
+
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.cookie.js"></script>
+
+    <style>
+        input[type="file"] {
+            color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Data Sharing Platform</h1>
+Private Key: <input type="text" name="hexPrivateKey" id="hexPrivateKey" placeholder="Hex Private Key..."  autofocus>
+<p></p>
+<button id="loginBtn">Login</button>
+<button id="btnUploadPEM">Login by PEM File</button>
+<input type="file" name="upload" id="upload" style="display: none;" />
+<!--<input id="uploadPEM" type="file" name="file" value="Login by PEM File" >-->
+
+<script>
+    // if already logged in, redirected to user home page.
+    if ($.cookie('hexPrivateKey') != null)
+    {
+        window.location.herf='/home';
+    }
+
+    // Login by Hex Private Key
+    $('#loginBtn').on('click', function() {
+        let hexPrivateKey = document.getElementById('hexPrivateKey').value;
+        // todo: check if target user is valid
+
+        // cookie
+        $.cookie("hexPrivateKey", hexPrivateKey, { expires: 7, path: '/' });
+        // login success, redirect to user home page
+        window.location.href='/home';
+
+    })
+
+    // Login by PEM file
+    // get filename of uploaded file
+    function getFileName(o){
+        var pos=o.lastIndexOf("\\");
+        return o.substring(pos+1);
+    }
+    // when click button 'btnUploadPEM', trigger select file
+    $('#btnUploadPEM').on('click', function () {
+        $('#upload').click();
+
+    })
+    // if a file is selected, send it to the server
+    $('#upload').change(function(){
+        // get file object
+        let fileObj = document.getElementById('upload').files[0];
+        // get file name
+        let fileName = getFileName($("#upload").val());
+        console.log("file name: " + fileName);
+        //新建一个FormData
+        let formData = new FormData();
+        //用户上传的文件,append进去
+        formData.append("file", fileObj);
+        formData.append("fileName",fileName);
+        $.ajax({
+            url : "/pemhandler",
+            type : "POST",
+            dataType : "text",
+            async : true,
+            cache : false,
+            data : formData,
+            processData : false, //  告诉jquery不要处理发送的数据
+            contentType : false, // 告诉jquery不要设置content-Type请求头
+            xhr : function() {
+                //给XMLHttpRequest对象的upload属性绑定onprogress方法监听上传过程
+                //var xnewhr = new XMLHttpRequest();  xnewhr.upload.onprogress = function(e) {}
+                //因为jQuery默认使用的XMLHttpRequest对象是内部生成的无法直接给jq的xhr绑定onprogress方法
+                //所以只要给jQuery重新生成一个绑定了onprogress的XMLHttpRequest对象即可实现
+                let newxhr = new XMLHttpRequest();
+                // 添加文件上传的监听
+                // onprogress:进度监听事件，只要上传文件的进度发生了变化，就会自动的触发这个事件
+                // newxhr.upload.onprogress = function(e) {
+                //     let percent = parseInt((e.loaded / e.total) * 100) + '%';
+                //     element.progress('demo', percent)
+                // }
+                return newxhr;
+            },
+            success : function(data) {
+                //上传成功
+                let json = JSON.parse(data);
+                console.log(json);
+                $.cookie("hexPrivateKey", json, { expires: 7, path: '/' });
+                // login success, redirect to user home page
+                window.location.href='/home';
+            },
+            error : function(data) {
+                alert("上传出现错误，请联系管理员");
+            }
+        })
+
+    })
+
+
+</script>
+</body>
+</html>

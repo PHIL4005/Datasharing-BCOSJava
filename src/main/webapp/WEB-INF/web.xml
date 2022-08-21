@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"
+         metadata-complete="true">
+
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:springmvc.xml</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>getmetadata</servlet-name>
+        <servlet-class>com.sh.datasharing.servlet.GetMetadataServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getmetadata</servlet-name>
+        <url-pattern>/getmetadata</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>publishHandler</servlet-name>
+        <servlet-class>com.sh.datasharing.servlet.PublishMetadataServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>publishHandler</servlet-name>
+        <url-pattern>/publishHandler</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>totalfilecount</servlet-name>
+        <servlet-class>com.sh.datasharing.servlet.GetFileNumServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>totalfilecount</servlet-name>
+        <url-pattern>/totalfilecount</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>thisfilemetadata</servlet-name>
+        <servlet-class>com.sh.datasharing.servlet.GetUploadedMetadataByIDServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>thisfilemetadata</servlet-name>
+        <url-pattern>/thisfilemetadata</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>pemhandler</servlet-name>
+        <servlet-class>com.sh.datasharing.servlet.PEMFileHandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>pemhandler</servlet-name>
+        <url-pattern>/pemhandler</url-pattern>
+    </servlet-mapping>
+
+</web-app>

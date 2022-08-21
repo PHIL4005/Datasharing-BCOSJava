@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Published Files</title>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <style>
+        #searchContent {
+            background-image: url('https://static.runoob.com/images/mix/searchicon.png'); /* 搜索按钮 */
+            background-position: 10px 12px; /* 定位搜索按钮 */
+            background-repeat: no-repeat; /* 不重复图片 */
+            width: 100%;
+            font-size: 16px;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+        }
+        a {
+            text-decoration: none;
+        }
+        table {
+            width: 100%;
+            font-size: 18px;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        td, th {
+            border: 1px solid #333;
+            padding: 12px;
+        }
+        thead tr {
+            /* add frame for table */
+            border-bottom: 1px solid #ddd;
+            height: 50px;
+            background-color: #ddd;
+        }
+        tr:hover {
+            /* change background color when mouse swift over table */
+            background-color: #ddd;
+        }
+    </style>
+
+</head>
+
+<body>
+<input type="text" id="searchContent" onkeyup="mySearch()" placeholder="Search...">
+<table id="myTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>File Name</th>
+        <th>File Type</th>
+        <th>Size</th>
+        <th>Upload Time</th>
+        <th>Description</th>
+        <th>Owner</th>
+        <th>Option</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    // load file data from Blockchain
+    let fileCnt;
+    let json;
+    $(document).ready(function () {
+        $.get('/totalfilecount', function(data){
+            // get count of uploaded files
+            fileCnt = JSON.parse(data);
+            console.log(fileCnt);
+        }).then(function(){
+            // load metadata of each file
+            let tbody = document.querySelector('tbody');
+            for (let i=0; i < fileCnt; i++){
+                $.post('/thisfilemetadata', {fileID: i+1},function(data){
+                    json = JSON.parse(data);
+                    // 1.创建行
+                    let tr = document.createElement('tr');
+                    tbody.appendChild(tr);
+                    // 2.行里面创建单元格(跟数据有关系的7个单元格) td 单元格的数量取决于每个对象里面的属性个数 for循环遍历对象
+                    // id
+                    let td1 = document.createElement('td');
+                    td1.innerHTML = i + 1;
+                    tr.appendChild(td1);
+                    // file name
+                    let td2 = document.createElement('td');
+                    td2.innerHTML = json.value1;
+                    tr.appendChild(td2);
+                    // type
+                    let td3 = document.createElement('td');
+                    td3.innerHTML = json.value4;
+                    tr.appendChild(td3);
+                    // size
+                    let td4 = document.createElement('td');
+                    td4.innerHTML = json.value5;
+                    tr.appendChild(td4);
+                    // time
+                    let td5 = document.createElement('td');
+                    let timeStamp = json.value3;
+                    td5.innerHTML = getTimeFromTimeStamp(timeStamp);
+
+                    tr.appendChild(td5);
+                    // description
+                    let td6 = document.createElement('td');
+                    td6.innerHTML = json.value6;
+                    tr.appendChild(td6);
+                    // owner
+                    let td7 = document.createElement('td');
+                    td7.innerHTML = json.value2;
+                    tr.appendChild(td7);
+                    // buttons
+                    let td8 = document.createElement('td');
+                    td8.innerHTML = '<a href="javascript:;">GetFile</a>';
+                    tr.appendChild(td8);
+
+                })
+            }
+        })
+    })
+
+    // transform timestamp into date
+    function getTimeFromTimeStamp(timestamp) {
+        let date = new Date(timestamp + 8 * 3600*1000 );
+        return date.toJSON().substr(0, 19).replace('T', ' ');
+    }
+
+    // search and filter
+    function mySearch() {
+        // 声明变量
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("searchContent");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+
+        // 循环表格每一行，查找匹配项
+        for (i = 0; i < tr.length; i++) {
+            for (j = 0; j < 7; j++) {
+                td = tr[i].getElementsByTagName("td")[j];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                        break;
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+
+
+</script>
+</body>
+
+</html>

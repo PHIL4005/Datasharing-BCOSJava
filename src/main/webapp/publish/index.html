@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get Metadata</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.css" rel="stylesheet">
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <style>
+        div{
+            width: 1000px;
+            height: 200px;
+            border: 1px solid #cd6969;
+        }
+        input{
+            width: 350px;
+        }
+    </style>
+</head>
+<body>
+<form name="getmetadata">
+</form>
+<p></p>
+File Path: <input type="text" name="filepath" id="filepath"  required autofocus>
+Description: <input type="text" name="description" id="description">
+<p></p><p></p>
+<button id="btn">Get Metadata</button>
+<button id="btn2">Publish</button>
+<p></p>
+<div id="res"></div>
+<!--<textarea name="showMetadata" id="showMetadata" cols="30" rows="10"></textarea>-->
+
+<script>
+
+    // generate metahash
+    $('#btn').on('click', function () {
+        console.log('==== btn click ====');
+        let _filepath = document.getElementById('filepath').value;
+        let result = document.getElementById('res');
+        let json;
+
+        console.log(_filepath);
+        $.post('/getmetadata', {filepath: _filepath},  function(data){
+            json = JSON.parse(data);
+            result.innerHTML = "File Name: " + json.fileName + "<br>" +
+                               "Type: " + json.fileType + "<br>" +
+                               "Size: " + json.size + "<br>" +
+                               "Metadata Hash: " + json.metadataHash;
+        });
+    })
+
+    // publish to block chain
+    $('#btn2').on('click', function () {
+        console.log('==== btn2 click ====');
+        let _filepath = document.getElementById('filepath').value;
+        let _description = document.getElementById('description').value;
+        let result = document.getElementById('res');
+        let json;
+
+        $.post('/publishHandler', {filepath: _filepath, description: _description}, function(data){
+            json = JSON.parse(data);
+            result.innerHTML =  "File Name: " + json.value1 + "<br>" +
+                                "Type: " + json.value4 + "<br>" +
+                                "Size: " + json.value5 + "<br>" +
+                                "Metadata Hash: " + json.value7 + "<br>" +
+                                "Publish Date: " + json.value3 + "<br>" +
+                                "Publisher: " + json.value2 + "<br>" +
+                                "Description: " + json.value6;
+        });
+    })
+
+</script>
+</body>
+</html>
